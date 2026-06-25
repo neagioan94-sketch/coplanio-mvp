@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
-import { hasAnyActiveMembership } from "@/lib/auth/membership";
+import {
+  getActiveOrganization,
+  isOrganizationAdmin,
+} from "@/lib/organizations/get-organization";
+import AppShell from "@/components/layout/app-shell";
 
 export default async function DashboardLayout({
   children,
@@ -13,11 +17,31 @@ export default async function DashboardLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) redirect("/login");
 
-  const hasMembership = await hasAnyActiveMembership(supabase, user.id);
-  if (!hasMembership) redirect("/setup/organization");
+  const activeOrg = await getActiveOrganization(supabase, user.id);
+  if (!activeOrg) redirect("/setup/organization");
 
-  return <>{children}</>;
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("name")
+    .eq("id", activeOrg.organizationId)
+    .single();
+
+  const admin = await isOrganizationAdmin(
+    supabase,
+    user.id,
+    activeOrg.organizationId,
+  );
+
+  return (
+    <AppShell
+      orgName={org?.name ?? "Organization"}
+      role={activeOrg.role}
+      userEmail={user.email ?? ""}
+      isAdmin={admin}
+    >
+      {children}
+    </AppShell>
+  );
 }
