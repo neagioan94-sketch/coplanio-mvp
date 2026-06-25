@@ -11,6 +11,9 @@ export async function hasAnyActiveMembership(
     .eq("status", "active")
     .limit(1);
 
-  if (error) return false;
+  if (error) {
+    console.error("[hasAnyActiveMembership] query failed:", error.message);
+    return false;
+  }
   return (data?.length ?? 0) > 0;
 }

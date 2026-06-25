@@ -72,6 +72,32 @@ Three helper functions are defined in `002_phase_1_rls.sql`:
 
 All helper functions use `SECURITY DEFINER` with `SET search_path = public`.
 
+## Missing Environment Variables — Phase 2 Behavior
+
+The application requires two environment variables to connect to Supabase:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+When either variable is absent, the following safe fallbacks apply:
+
+| Layer | Behavior |
+|-------|----------|
+| `lib/db/supabase-server.ts` | Logs a `console.warn` and returns `null` instead of throwing |
+| `lib/db/supabase-client.ts` | Logs a `console.warn` and returns `null` instead of throwing |
+| `proxy.ts` | Detects missing vars, skips auth check, passes the request through |
+| Server components / layouts | Check for `null` client, redirect to `/login` where applicable |
+| Auth pages (`/login`, `/register`) | Skip session check when client is `null`, render the form |
+
+In practice, a deployment without these variables renders the login and register pages
+but every protected route redirects to `/login`. No unhandled exceptions occur at import
+or render time.
+
+**Required action before going live:** set both variables in your hosting environment
+(Vercel project settings, `.env.local` for local dev, etc.) and restart the server.
+
 ## Security Rules Summary
 
 - Organization is the primary tenant boundary.

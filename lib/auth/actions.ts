@@ -60,7 +60,7 @@ export async function registerAction(
 
   const user = data.user;
   if (user) {
-    await supabase.from("profiles").upsert(
+    const { error: profileError } = await supabase.from("profiles").upsert(
       {
         id: user.id,
         full_name: parsed.data.full_name,
@@ -69,6 +69,11 @@ export async function registerAction(
       },
       { onConflict: "id" },
     );
+
+    if (profileError) {
+      console.error("[registerAction] profile upsert failed:", profileError.message);
+      return { error: "Account created but profile setup failed. Please contact support." };
+    }
   }
 
   redirect("/setup/organization");
