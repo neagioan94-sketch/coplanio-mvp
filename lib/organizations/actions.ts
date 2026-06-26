@@ -36,12 +36,16 @@ export async function createOrganizationAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const user = await requireUser();
-
   const supabase = await createClient();
   if (!supabase) return { error: "Service unavailable" };
 
-  const { data: org, error: orgError } = await supabase
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const adminClient = createAdminClient();
+  if (!adminClient) return { error: "Service unavailable" };
+
+  const { data: org, error: orgError } = await adminClient
     .from("organizations")
     .insert({
       name: parsed.data.name,
@@ -57,10 +61,15 @@ export async function createOrganizationAction(
     return { error: "Could not create organization. Please try again." };
   }
 
-  const adminClient = createAdminClient();
-  if (!adminClient) {
-    await supabase.from("organizations").delete().eq("id", org.id);
-    return { error: "Service unavailable" };
+  // Ensure profile row exists before inserting membership (FK: memberships.user_id → profiles.id)
+  const { error: profileError } = await adminClient
+    .from("profiles")
+    .upsert({ id: user.id, email: user.email }, { onConflict: "id" });
+
+  if (profileError) {
+    console.error("[createOrganizationAction] profile upsert failed:", profileError.message);
+    await adminClient.from("organizations").delete().eq("id", org.id);
+    return { error: "Could not complete organization setup. Please try again." };
   }
 
   const { error: membershipError } = await adminClient
