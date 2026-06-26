@@ -30,7 +30,6 @@ function SidebarContent({
   orgName,
   role,
   userEmail,
-  isAdmin,
   onClose,
 }: AppSidebarProps & { onClose?: () => void }) {
   const pathname = usePathname();
@@ -44,9 +43,9 @@ function SidebarContent({
     { href: "/matches", label: "Matches" },
     { href: "/assessments", label: "Assessments" },
     { href: "/reports", label: "Reports" },
-    { href: "/organization", label: "Organization" },
-    { href: "/organization/members", label: "Members" },
-    ...(isAdmin ? [{ href: "/organization/invitations", label: "Invitations" }] : []),
+    { href: "/settings/organization", label: "Organization" },
+    { href: "/settings/members", label: "Members" },
+    { href: "/settings/audit", label: "Audit Log" },
   ];
 
   const isActive = (href: string) => {
@@ -57,6 +56,9 @@ function SidebarContent({
     if (href === "/matches") return pathname === href || pathname.startsWith("/matches/");
     if (href === "/assessments") return pathname === href || pathname.startsWith("/assessments/");
     if (href === "/reports") return pathname === href || pathname.startsWith("/reports/");
+    if (href === "/settings/organization") return pathname === href;
+    if (href === "/settings/members") return pathname === href;
+    if (href === "/settings/audit") return pathname === href;
     return pathname === href;
   };
 
