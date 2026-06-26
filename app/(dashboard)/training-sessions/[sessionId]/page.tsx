@@ -8,6 +8,8 @@ import { getExercises } from "@/lib/exercises/get-exercises";
 import SessionExerciseList from "@/components/training-sessions/session-exercise-list";
 import AddSessionExerciseForm from "@/components/training-sessions/add-session-exercise-form";
 import ArchiveSessionButton from "@/components/training-sessions/archive-session-button";
+import { getAttendanceRoster } from "@/lib/attendance/get-attendance";
+import { AttendanceSummary } from "@/components/attendance/attendance-summary";
 
 interface SessionDetailPageProps {
   params: Promise<{ sessionId: string }>;
@@ -35,11 +37,12 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
   const activeOrg = await getActiveOrganization(supabase, user.id);
   if (!activeOrg) redirect("/setup/organization");
 
-  const [session, exercises, sessionExercises, canManage] = await Promise.all([
+  const [session, exercises, sessionExercises, canManage, roster] = await Promise.all([
     getTrainingSession(supabase, sessionId, activeOrg.organizationId),
     getExercises(supabase, activeOrg.organizationId),
     getSessionExercises(supabase, sessionId, activeOrg.organizationId),
     canManageSessions(supabase, user.id, activeOrg.organizationId),
+    getAttendanceRoster(supabase, sessionId, activeOrg.organizationId),
   ]);
 
   if (!session) redirect("/training-sessions");
@@ -131,6 +134,9 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
           </p>
         </section>
       )}
+
+      {/* Attendance summary */}
+      <AttendanceSummary roster={roster} sessionId={session.id} />
 
       {/* Session plan */}
       <section className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
