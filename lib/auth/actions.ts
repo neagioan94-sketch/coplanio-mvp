@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
+import { createAdminClient } from "@/lib/db/supabase-admin";
 import { loginSchema, registerSchema } from "@/schemas/auth";
 
 type ActionState = { error?: string } | undefined;
@@ -60,7 +61,10 @@ export async function registerAction(
 
   const user = data.user;
   if (user) {
-    const { error: profileError } = await supabase.from("profiles").upsert(
+    const adminClient = createAdminClient();
+    if (!adminClient) return { error: "Service unavailable" };
+
+    const { error: profileError } = await adminClient.from("profiles").upsert(
       {
         id: user.id,
         full_name: parsed.data.full_name,
