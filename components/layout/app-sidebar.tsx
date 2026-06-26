@@ -42,6 +42,7 @@ function SidebarContent({
     { href: "/exercises", label: "Exercises" },
     { href: "/training-sessions", label: "Training Sessions" },
     { href: "/matches", label: "Matches" },
+    { href: "/assessments", label: "Assessments" },
     { href: "/organization", label: "Organization" },
     { href: "/organization/members", label: "Members" },
     ...(isAdmin ? [{ href: "/organization/invitations", label: "Invitations" }] : []),
@@ -53,6 +54,7 @@ function SidebarContent({
     if (href === "/exercises") return pathname === href || pathname.startsWith("/exercises/");
     if (href === "/training-sessions") return pathname === href || pathname.startsWith("/training-sessions/");
     if (href === "/matches") return pathname === href || pathname.startsWith("/matches/");
+    if (href === "/assessments") return pathname === href || pathname.startsWith("/assessments/");
     return pathname === href;
   };
 
