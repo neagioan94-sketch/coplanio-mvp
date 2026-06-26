@@ -1,0 +1,171 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/db/supabase-server";
+import { requireUser } from "@/lib/auth/get-user";
+import { getActiveOrganization, canManageSessions } from "@/lib/organizations/get-organization";
+import { getTrainingSessions } from "@/lib/training-sessions/get-training-sessions";
+import { getTeams } from "@/lib/teams/get-teams";
+
+const STATUS_LABELS: Record<string, string> = {
+  planned: "Planned",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  planned: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  completed: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  cancelled: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+};
+
+interface SearchParams {
+  teamId?: string;
+  status?: string;
+}
+
+export default async function TrainingSessionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const { teamId, status } = await searchParams;
+
+  const user = await requireUser();
+  const supabase = await createClient();
+  if (!supabase) redirect("/login");
+
+  const activeOrg = await getActiveOrganization(supabase, user.id);
+  if (!activeOrg) redirect("/setup/organization");
+
+  const [sessions, canManage, teams] = await Promise.all([
+    getTrainingSessions(supabase, activeOrg.organizationId, {
+      teamId: teamId || undefined,
+      status: status || undefined,
+    }),
+    canManageSessions(supabase, user.id, activeOrg.organizationId),
+    getTeams(supabase, activeOrg.organizationId),
+  ]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+          Training Sessions
+        </h1>
+        {canManage && (
+          <Link
+            href="/training-sessions/new"
+            className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            New session
+          </Link>
+        )}
+      </div>
+
+      {/* Filters */}
+      <form method="get" className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="teamId" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Team
+          </label>
+          <select
+            id="teamId"
+            name="teamId"
+            defaultValue={teamId ?? ""}
+            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          >
+            <option value="">All teams</option>
+            {teams.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="status" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Status
+          </label>
+          <select
+            id="status"
+            name="status"
+            defaultValue={status ?? ""}
+            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+          >
+            <option value="">All statuses</option>
+            <option value="planned">Planned</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        >
+          Filter
+        </button>
+
+        {(teamId || status) && (
+          <Link
+            href="/training-sessions"
+            className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+          >
+            Clear
+          </Link>
+        )}
+      </form>
+
+      {sessions.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center dark:border-zinc-700">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            No training sessions yet. Plan your first session.
+          </p>
+          {canManage && (
+            <Link
+              href="/training-sessions/new"
+              className="mt-3 inline-block text-sm font-medium text-zinc-900 underline underline-offset-2 hover:no-underline dark:text-zinc-50"
+            >
+              Create session
+            </Link>
+          )}
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {sessions.map((s) => (
+            <li key={s.id}>
+              <Link
+                href={`/training-sessions/${s.id}`}
+                className="flex items-start justify-between rounded-lg border border-zinc-200 bg-white p-4 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+              >
+                <div className="flex flex-col gap-1 min-w-0">
+                  <p className="font-medium text-zinc-900 dark:text-zinc-50 truncate">
+                    {s.title}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    <span>{s.teamName}</span>
+                    <span>·</span>
+                    <span>{s.sessionDate}</span>
+                    {s.startTime && <span>· {s.startTime.slice(0, 5)}</span>}
+                    {s.durationMinutes && <span>· {s.durationMinutes} min</span>}
+                  </div>
+                  {s.objective && (
+                    <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500 line-clamp-1">
+                      {s.objective}
+                    </p>
+                  )}
+                </div>
+                <span
+                  className={`ml-3 mt-0.5 flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[s.status] ?? "bg-zinc-100 text-zinc-500"}`}
+                >
+                  {STATUS_LABELS[s.status] ?? s.status}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
