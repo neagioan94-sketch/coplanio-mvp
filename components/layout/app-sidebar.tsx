@@ -37,12 +37,16 @@ function SidebarContent({
 
   const navItems: NavItem[] = [
     { href: "/dashboard", label: "Dashboard" },
+    { href: "/teams", label: "Teams" },
     { href: "/organization", label: "Organization" },
     { href: "/organization/members", label: "Members" },
     ...(isAdmin ? [{ href: "/organization/invitations", label: "Invitations" }] : []),
   ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => {
+    if (href === "/teams") return pathname === href || pathname.startsWith("/teams/");
+    return pathname === href;
+  };
 
   return (
     <div className="flex h-full flex-col">
