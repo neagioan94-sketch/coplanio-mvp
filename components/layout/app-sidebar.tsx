@@ -38,6 +38,7 @@ function SidebarContent({
   const navItems: NavItem[] = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/teams", label: "Teams" },
+    { href: "/players", label: "Players" },
     { href: "/organization", label: "Organization" },
     { href: "/organization/members", label: "Members" },
     ...(isAdmin ? [{ href: "/organization/invitations", label: "Invitations" }] : []),
@@ -45,6 +46,7 @@ function SidebarContent({
 
   const isActive = (href: string) => {
     if (href === "/teams") return pathname === href || pathname.startsWith("/teams/");
+    if (href === "/players") return pathname === href || pathname.startsWith("/players/");
     return pathname === href;
   };
 

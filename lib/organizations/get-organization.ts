@@ -122,6 +122,24 @@ export async function canManageTeams(
   return (data?.length ?? 0) > 0;
 }
 
+export async function canManagePlayers(
+  supabase: SupabaseClient,
+  userId: string,
+  organizationId: string,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("memberships")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("organization_id", organizationId)
+    .eq("status", "active")
+    .in("role", ["organization_admin", "head_coach"])
+    .limit(1);
+
+  if (error) return false;
+  return (data?.length ?? 0) > 0;
+}
+
 export async function getInvitedMembership(
   supabase: SupabaseClient,
   userId: string,
