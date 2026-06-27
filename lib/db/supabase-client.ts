@@ -5,7 +5,6 @@ export function createClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    // TODO: Replace with real credentials once Supabase project is configured (Phase 1)
     console.warn("Supabase env vars not set — client unavailable.");
     return null;
   }
