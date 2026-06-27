@@ -56,31 +56,33 @@ export default async function SettingsMembersPage() {
         {visibleMembers.length === 0 ? (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">No members yet.</p>
         ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Name</th>
-                <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Email</th>
-                <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Role</th>
-                <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Status</th>
-                {admin && (
-                  <th className="pb-2 text-right font-medium text-zinc-500 dark:text-zinc-400">
-                    Actions
-                  </th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {visibleMembers.map((member) => (
-                <MemberRowComponent
-                  key={member.id}
-                  member={member}
-                  organizationId={activeOrg.organizationId}
-                  isAdmin={admin}
-                />
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                  <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Name</th>
+                  <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Email</th>
+                  <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Role</th>
+                  <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                  {admin && (
+                    <th className="pb-2 text-right font-medium text-zinc-500 dark:text-zinc-400">
+                      Actions
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {visibleMembers.map((member) => (
+                  <MemberRowComponent
+                    key={member.id}
+                    member={member}
+                    organizationId={activeOrg.organizationId}
+                    isAdmin={admin}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 
@@ -89,38 +91,40 @@ export default async function SettingsMembersPage() {
           <h2 className="mb-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Pending invitations
           </h2>
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Email</th>
-                <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Role</th>
-                <th className="pb-2 text-right font-medium text-zinc-500 dark:text-zinc-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingInvitations.map((inv) => (
-                <tr
-                  key={inv.id}
-                  className="border-b border-zinc-100 dark:border-zinc-800/50 last:border-0"
-                >
-                  <td className="py-3 pr-4 text-zinc-900 dark:text-zinc-50">
-                    {inv.email ?? "—"}
-                  </td>
-                  <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">
-                    {ROLE_LABELS[inv.role] ?? inv.role}
-                  </td>
-                  <td className="py-3 text-right">
-                    <RevokeInvitationForm
-                      memberId={inv.id}
-                      organizationId={activeOrg.organizationId}
-                    />
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                  <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Email</th>
+                  <th className="pb-2 pr-4 font-medium text-zinc-500 dark:text-zinc-400">Role</th>
+                  <th className="pb-2 text-right font-medium text-zinc-500 dark:text-zinc-400">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pendingInvitations.map((inv) => (
+                  <tr
+                    key={inv.id}
+                    className="border-b border-zinc-100 dark:border-zinc-800/50 last:border-0"
+                  >
+                    <td className="py-3 pr-4 text-zinc-900 dark:text-zinc-50">
+                      {inv.email ?? "—"}
+                    </td>
+                    <td className="py-3 pr-4 text-zinc-600 dark:text-zinc-400">
+                      {ROLE_LABELS[inv.role] ?? inv.role}
+                    </td>
+                    <td className="py-3 text-right">
+                      <RevokeInvitationForm
+                        memberId={inv.id}
+                        organizationId={activeOrg.organizationId}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
     </div>

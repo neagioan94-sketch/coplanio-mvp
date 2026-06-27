@@ -62,7 +62,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <Link
             href="/reports"
@@ -75,7 +75,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
           </h1>
         </div>
         {canManage && !report.isArchived && (
-          <div className="mt-8 shrink-0">
+          <div className="shrink-0 sm:mt-8">
             <ArchiveReportButton
               organizationId={activeOrg.organizationId}
               reportId={report.id}

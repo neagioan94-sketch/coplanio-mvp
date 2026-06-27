@@ -58,32 +58,34 @@ export default async function AttendancePage({ params }: AttendancePageProps) {
                 No active players are assigned to this team yet.
               </p>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-muted-foreground">
-                    <th className="pb-2 pr-4 font-medium">#</th>
-                    <th className="pb-2 pr-4 font-medium">Player</th>
-                    <th className="pb-2 pr-4 font-medium">Status</th>
-                    <th className="pb-2 font-medium">Notes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {roster.map((entry) => (
-                    <tr key={entry.playerId} className="border-b last:border-0">
-                      <td className="py-2 pr-4 text-muted-foreground">
-                        {entry.squadNumber ?? "—"}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {entry.displayName ?? `${entry.firstName} ${entry.lastName}`}
-                      </td>
-                      <td className="py-2 pr-4 capitalize">{entry.currentStatus}</td>
-                      <td className="py-2 text-muted-foreground">
-                        {entry.currentNotes || "—"}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="pb-2 pr-4 font-medium">#</th>
+                      <th className="pb-2 pr-4 font-medium">Player</th>
+                      <th className="pb-2 pr-4 font-medium">Status</th>
+                      <th className="pb-2 font-medium">Notes</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {roster.map((entry) => (
+                      <tr key={entry.playerId} className="border-b last:border-0">
+                        <td className="py-2 pr-4 text-muted-foreground">
+                          {entry.squadNumber ?? "—"}
+                        </td>
+                        <td className="py-2 pr-4">
+                          {entry.displayName ?? `${entry.firstName} ${entry.lastName}`}
+                        </td>
+                        <td className="py-2 pr-4 capitalize">{entry.currentStatus}</td>
+                        <td className="py-2 text-muted-foreground">
+                          {entry.currentNotes || "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}

@@ -46,7 +46,7 @@ export default async function PlayerDetailPage({ params }: PlayerDetailPageProps
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <Link
             href="/players"
