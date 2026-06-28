@@ -26,7 +26,7 @@ export default async function InvitationsPage() {
 
   const { data: invitations } = await supabase
     .from("memberships")
-    .select("id, role, profiles(full_name, email)")
+    .select("id, role, profiles!user_id(full_name, email)")
     .eq("organization_id", activeOrg.organizationId)
     .eq("status", "invited");
 

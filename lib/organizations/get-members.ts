@@ -16,7 +16,7 @@ export async function getOrganizationMembers(
 ): Promise<MemberRow[]> {
   const { data, error } = await supabase
     .from("memberships")
-    .select("id, user_id, role, status, joined_at, profiles(full_name, email)")
+    .select("id, user_id, role, status, joined_at, profiles!user_id(full_name, email)")
     .eq("organization_id", organizationId)
     .order("joined_at", { ascending: true, nullsFirst: false });
 

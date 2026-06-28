@@ -109,10 +109,12 @@ export async function acceptInvitationAction(
 
   const user = await requireUser();
 
-  const supabase = await createClient();
-  if (!supabase) return { error: "Service unavailable" };
+  const adminClient = createAdminClient();
+  if (!adminClient) return { error: "Service unavailable" };
 
-  const { data: membership, error: fetchError } = await supabase
+  // adminClient bypasses RLS: invited memberships have status='invited' so the
+  // normal client cannot read or update them (policies require active membership).
+  const { data: membership, error: fetchError } = await adminClient
     .from("memberships")
     .select("id")
     .eq("user_id", user.id)
@@ -124,9 +126,6 @@ export async function acceptInvitationAction(
   if (fetchError || !membership) {
     return { error: "No pending invitation found" };
   }
-
-  const adminClient = createAdminClient();
-  if (!adminClient) return { error: "Service unavailable" };
 
   const { error: updateError } = await adminClient
     .from("memberships")
@@ -172,7 +171,14 @@ export async function inviteMemberAction(
 
   await requireRole(supabase, user.id, organizationId, ["organization_admin"]);
 
-  const { data: profile, error: profileError } = await supabase
+  // adminClient bypasses RLS for the cross-org profile lookup:
+  // the invitee is not yet a member of this org, so the regular client
+  // cannot see their profile (RLS only allows reading profiles of existing
+  // shared-org members).
+  const adminClient = createAdminClient();
+  if (!adminClient) return { error: "Service unavailable" };
+
+  const { data: profile, error: profileError } = await adminClient
     .from("profiles")
     .select("id")
     .eq("email", parsed.data.email)

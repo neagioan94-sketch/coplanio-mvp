@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
+import { createAdminClient } from "@/lib/db/supabase-admin";
 import { getActiveOrganization, getInvitedMembership } from "@/lib/organizations/get-organization";
 import CreateOrganizationForm from "@/components/organizations/create-organization-form";
 import AcceptInvitationForm from "@/components/organizations/accept-invitation-form";
@@ -25,9 +26,11 @@ export default async function SetupOrganizationPage({
   const params = await searchParams;
   const skipInvite = params.skip === "true";
 
-  const invited = skipInvite
-    ? null
-    : await getInvitedMembership(supabase, user.id);
+  const adminClient = createAdminClient();
+  const invited =
+    skipInvite || !adminClient
+      ? null
+      : await getInvitedMembership(adminClient, user.id);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
