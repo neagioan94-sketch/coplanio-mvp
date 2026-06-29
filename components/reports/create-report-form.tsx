@@ -58,8 +58,6 @@ export default function CreateReportForm({
 
   return (
     <form action={action} className="flex flex-col gap-5">
-      <input type="hidden" name="organizationId" value={organizationId} />
-
       {state?.error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
           {state.error}

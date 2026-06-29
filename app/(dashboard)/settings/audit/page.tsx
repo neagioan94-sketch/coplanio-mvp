@@ -1,11 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
-import { getActiveOrganization } from "@/lib/organizations/get-organization";
+import { getActiveOrganization, requireRole } from "@/lib/organizations/get-organization";
 import { getAuditEvents } from "@/lib/audit/get-audit-events";
 import AuditEventsList from "@/components/settings/audit-events-list";
-
-const SETTINGS_ROLES = ["organization_admin", "head_coach"] as const;
 
 export default async function SettingsAuditPage() {
   const user = await requireUser();
@@ -15,9 +13,7 @@ export default async function SettingsAuditPage() {
   const activeOrg = await getActiveOrganization(supabase, user.id);
   if (!activeOrg) redirect("/setup/organization");
 
-  if (!(SETTINGS_ROLES as readonly string[]).includes(activeOrg.role)) {
-    redirect("/dashboard");
-  }
+  await requireRole(supabase, user.id, activeOrg.organizationId, ["organization_admin", "head_coach"]);
 
   const events = await getAuditEvents(supabase, activeOrg.organizationId, { limit: 50 });
 

@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
-import { getActiveOrganization, isOrganizationAdmin } from "@/lib/organizations/get-organization";
+import { getActiveOrganization, isOrganizationAdmin, requireRole } from "@/lib/organizations/get-organization";
 import { getOrganizationMembers } from "@/lib/organizations/get-members";
 import InviteMemberForm from "@/components/organizations/invite-member-form";
 import MemberRowComponent from "@/components/organizations/member-row";
 import RevokeInvitationForm from "@/components/organizations/revoke-invitation-form";
-
-const SETTINGS_ROLES = ["organization_admin", "head_coach"] as const;
 
 const ROLE_LABELS: Record<string, string> = {
   organization_admin: "Admin",
@@ -24,9 +22,7 @@ export default async function SettingsMembersPage() {
   const activeOrg = await getActiveOrganization(supabase, user.id);
   if (!activeOrg) redirect("/setup/organization");
 
-  if (!(SETTINGS_ROLES as readonly string[]).includes(activeOrg.role)) {
-    redirect("/dashboard");
-  }
+  await requireRole(supabase, user.id, activeOrg.organizationId, ["organization_admin", "head_coach"]);
 
   const [members, admin] = await Promise.all([
     getOrganizationMembers(supabase, activeOrg.organizationId),

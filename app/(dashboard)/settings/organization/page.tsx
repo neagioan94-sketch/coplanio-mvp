@@ -1,10 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
-import { getActiveOrganization, isOrganizationAdmin } from "@/lib/organizations/get-organization";
+import { getActiveOrganization, isOrganizationAdmin, requireRole } from "@/lib/organizations/get-organization";
 import UpdateOrganizationForm from "@/components/organizations/update-organization-form";
-
-const SETTINGS_ROLES = ["organization_admin", "head_coach"] as const;
 
 export default async function SettingsOrganizationPage() {
   const user = await requireUser();
@@ -14,9 +12,7 @@ export default async function SettingsOrganizationPage() {
   const activeOrg = await getActiveOrganization(supabase, user.id);
   if (!activeOrg) redirect("/setup/organization");
 
-  if (!(SETTINGS_ROLES as readonly string[]).includes(activeOrg.role)) {
-    redirect("/dashboard");
-  }
+  await requireRole(supabase, user.id, activeOrg.organizationId, ["organization_admin", "head_coach"]);
 
   const { data: org } = await supabase
     .from("organizations")

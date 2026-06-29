@@ -27,7 +27,6 @@ export default function ArchiveReportButton({
 
   return (
     <form action={action} onSubmit={handleSubmit}>
-      <input type="hidden" name="organizationId" value={organizationId} />
       <input type="hidden" name="reportId" value={reportId} />
       {state?.error && (
         <p className="mb-2 text-sm text-red-600 dark:text-red-400">{state.error}</p>

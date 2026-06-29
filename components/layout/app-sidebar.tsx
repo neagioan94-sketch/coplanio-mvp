@@ -30,11 +30,12 @@ function SidebarContent({
   orgName,
   role,
   userEmail,
+  isAdmin,
   onClose,
 }: AppSidebarProps & { onClose?: () => void }) {
   const pathname = usePathname();
 
-  const navItems: NavItem[] = [
+  const mainNavItems: NavItem[] = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/teams", label: "Teams" },
     { href: "/players", label: "Players" },
@@ -43,10 +44,17 @@ function SidebarContent({
     { href: "/matches", label: "Matches" },
     { href: "/assessments", label: "Assessments" },
     { href: "/reports", label: "Reports" },
-    { href: "/settings/organization", label: "Organization" },
-    { href: "/settings/members", label: "Members" },
-    { href: "/settings/audit", label: "Audit Log" },
   ];
+
+  const settingsNavItems: NavItem[] = isAdmin
+    ? [
+        { href: "/settings/organization", label: "Organization" },
+        { href: "/settings/members", label: "Members" },
+        { href: "/settings/audit", label: "Audit Log" },
+      ]
+    : [];
+
+  const navItems = [...mainNavItems, ...settingsNavItems];
 
   const isActive = (href: string) => {
     if (href === "/teams") return pathname === href || pathname.startsWith("/teams/");

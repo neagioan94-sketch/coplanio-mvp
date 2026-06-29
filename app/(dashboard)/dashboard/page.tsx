@@ -72,14 +72,28 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-          Coming soon
+      <section>
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          Modules
         </h2>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          Future modules — Players, Training Sessions, Matches, and Reports —
-          will appear here once they are ready.
-        </p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Link href="/players" className="rounded-lg border border-zinc-200 bg-white p-4 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Players</p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">View and manage your players</p>
+          </Link>
+          <Link href="/training-sessions" className="rounded-lg border border-zinc-200 bg-white p-4 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Training Sessions</p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Schedule and track sessions</p>
+          </Link>
+          <Link href="/matches" className="rounded-lg border border-zinc-200 bg-white p-4 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Matches</p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Log and review match results</p>
+          </Link>
+          <Link href="/reports" className="rounded-lg border border-zinc-200 bg-white p-4 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Reports</p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Generate and view reports</p>
+          </Link>
+        </div>
       </section>
     </div>
   );

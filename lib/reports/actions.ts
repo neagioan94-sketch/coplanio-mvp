@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
-import { requireRole } from "@/lib/organizations/get-organization";
+import { requireRole, requireActiveOrganization } from "@/lib/organizations/get-organization";
 import { createAuditEvent } from "@/lib/audit/create-audit-event";
 import { createReportSchema, reportActionSchema } from "@/schemas/reports";
 import { buildReportContent } from "@/lib/reports/build-report-content";
@@ -20,11 +20,6 @@ export async function createReportAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const organizationId = formData.get("organizationId");
-  if (!organizationId || typeof organizationId !== "string") {
-    return { error: "Invalid organization" };
-  }
-
   const sourceEntityTypeRaw = formData.get("source_entity_type");
   const sourceEntityIdRaw = formData.get("source_entity_id");
 
@@ -50,6 +45,8 @@ export async function createReportAction(
   const supabase = await createClient();
   if (!supabase) return { error: "Service unavailable" };
 
+  const activeOrg = await requireActiveOrganization(supabase, user.id);
+  const { organizationId } = activeOrg;
   await requireRole(supabase, user.id, organizationId, [...MANAGE_ROLES]);
 
   let content: Record<string, unknown> | null = null;
@@ -112,11 +109,6 @@ export async function archiveReportAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const organizationId = formData.get("organizationId");
-  if (!organizationId || typeof organizationId !== "string") {
-    return { error: "Invalid organization" };
-  }
-
   const parsed = reportActionSchema.safeParse({
     reportId: formData.get("reportId"),
   });
@@ -126,6 +118,8 @@ export async function archiveReportAction(
   const supabase = await createClient();
   if (!supabase) return { error: "Service unavailable" };
 
+  const activeOrg = await requireActiveOrganization(supabase, user.id);
+  const { organizationId } = activeOrg;
   await requireRole(supabase, user.id, organizationId, [...MANAGE_ROLES]);
 
   const { data: report, error: fetchError } = await supabase
