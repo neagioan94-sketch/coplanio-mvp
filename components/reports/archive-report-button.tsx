@@ -6,12 +6,10 @@ import { archiveReportAction } from "@/lib/reports/actions";
 type ActionState = { error?: string; success?: boolean } | undefined;
 
 interface ArchiveReportButtonProps {
-  organizationId: string;
   reportId: string;
 }
 
 export default function ArchiveReportButton({
-  organizationId,
   reportId,
 }: ArchiveReportButtonProps) {
   const [state, action, isPending] = useActionState<ActionState, FormData>(

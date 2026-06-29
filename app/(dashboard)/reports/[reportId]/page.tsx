@@ -77,7 +77,6 @@ export default async function ReportPage({ params }: ReportPageProps) {
         {canManage && !report.isArchived && (
           <div className="shrink-0 sm:mt-8">
             <ArchiveReportButton
-              organizationId={activeOrg.organizationId}
               reportId={report.id}
             />
           </div>

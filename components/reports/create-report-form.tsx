@@ -34,7 +34,6 @@ const SOURCE_ENTITY_LABELS: Record<string, string> = {
 type ActionState = { error?: string; success?: boolean } | undefined;
 
 interface CreateReportFormProps {
-  organizationId: string;
   players: PlayerRow[];
   teams: TeamRow[];
   sessions: TrainingSessionRow[];
@@ -43,7 +42,6 @@ interface CreateReportFormProps {
 }
 
 export default function CreateReportForm({
-  organizationId,
   players,
   teams,
   sessions,

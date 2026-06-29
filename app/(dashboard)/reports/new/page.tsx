@@ -43,7 +43,6 @@ export default async function NewReportPage() {
 
       <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
         <CreateReportForm
-          organizationId={activeOrg.organizationId}
           players={players}
           teams={teams}
           sessions={sessions}
