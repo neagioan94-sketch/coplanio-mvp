@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
@@ -226,6 +227,10 @@ export async function updateTeamAction(
     },
   });
 
+  revalidatePath(`/teams/${teamId}`);
+  revalidatePath(`/teams/${teamId}/edit`);
+  revalidatePath("/teams");
+
   return { success: true };
 }
 
@@ -384,6 +389,9 @@ export async function assignTeamStaffAction(
     newValue: { userId: parsed.data.userId, staffRole: parsed.data.staffRole },
   });
 
+  revalidatePath(`/teams/${teamId}/staff`);
+  revalidatePath(`/teams/${teamId}`);
+
   return { success: true };
 }
 
@@ -456,6 +464,9 @@ export async function updateTeamStaffRoleAction(
     newValue: { teamStaffId: staffRow.id, staffRole: parsed.data.staffRole },
   });
 
+  revalidatePath(`/teams/${teamId}/staff`);
+  revalidatePath(`/teams/${teamId}`);
+
   return { success: true };
 }
 
@@ -523,6 +534,9 @@ export async function removeTeamStaffAction(
     targetId: teamId,
     previousValue: { teamStaffId: parsed.data.teamStaffId },
   });
+
+  revalidatePath(`/teams/${teamId}/staff`);
+  revalidatePath(`/teams/${teamId}`);
 
   return { success: true };
 }

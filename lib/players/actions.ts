@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { requireRole } from "@/lib/organizations/get-organization";
@@ -230,6 +231,10 @@ export async function updatePlayerAction(
     },
   });
 
+  revalidatePath(`/players/${playerId}`);
+  revalidatePath(`/players/${playerId}/edit`);
+  revalidatePath("/players");
+
   return { success: true };
 }
 
@@ -391,6 +396,8 @@ export async function assignPlayerTeamAction(
     newValue: { team_id: parsed.data.team_id, squad_number: parsed.data.squad_number ?? null },
   });
 
+  revalidatePath(`/players/${playerId}`);
+
   return { success: true };
 }
 
@@ -475,6 +482,8 @@ export async function updatePlayerTeamAction(
     newValue: updates,
   });
 
+  revalidatePath(`/players/${playerId}`);
+
   return { success: true };
 }
 
@@ -547,6 +556,8 @@ export async function removePlayerTeamAction(
     targetId: playerId,
     previousValue: { membership_id: parsed.data.membership_id },
   });
+
+  revalidatePath(`/players/${playerId}`);
 
   return { success: true };
 }

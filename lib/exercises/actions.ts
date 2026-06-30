@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { requireRole } from "@/lib/organizations/get-organization";
@@ -195,6 +196,10 @@ export async function updateExerciseAction(
     previousValue: { name: current.name, objective: current.objective },
     newValue: { name: parsed.data.name, objective: parsed.data.objective },
   });
+
+  revalidatePath(`/exercises/${exerciseId}`);
+  revalidatePath(`/exercises/${exerciseId}/edit`);
+  revalidatePath("/exercises");
 
   return { success: true };
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { requireRole, requireActiveOrganization } from "@/lib/organizations/get-organization";
@@ -162,6 +163,9 @@ export async function updateAssessmentTypeAction(
     previousValue: { name: current.name },
     newValue: { name: parsed.data.name },
   });
+
+  revalidatePath("/assessments");
+  revalidatePath(`/assessments/types/${assessmentTypeId}/edit`);
 
   return { success: true };
 }

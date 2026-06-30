@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { requireRole } from "@/lib/organizations/get-organization";
@@ -196,6 +197,10 @@ export async function updateMatchAction(
     previousValue: { opponent: current.opponent, match_date: current.match_date },
     newValue: { opponent: parsed.data.opponent, match_date: parsed.data.match_date },
   });
+
+  revalidatePath(`/matches/${matchId}`);
+  revalidatePath(`/matches/${matchId}/edit`);
+  revalidatePath("/matches");
 
   return { success: true };
 }

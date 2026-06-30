@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { createAdminClient } from "@/lib/db/supabase-admin";
 import { requireUser } from "@/lib/auth/get-user";
@@ -222,6 +223,8 @@ export async function inviteMemberAction(
     return { error: "Could not send invitation. Please try again." };
   }
 
+  revalidatePath("/settings/members");
+
   return { success: true };
 }
 
@@ -281,6 +284,8 @@ export async function updateMemberRoleAction(
     return { error: "Could not update role. Please try again." };
   }
 
+  revalidatePath("/settings/members");
+
   return { success: true };
 }
 
@@ -336,6 +341,8 @@ export async function suspendMemberAction(
     console.error("[suspendMemberAction] update failed:", updateError.message);
     return { error: "Could not suspend member. Please try again." };
   }
+
+  revalidatePath("/settings/members");
 
   return { success: true };
 }
@@ -393,6 +400,8 @@ export async function removeMemberAction(
     return { error: "Could not remove member. Please try again." };
   }
 
+  revalidatePath("/settings/members");
+
   return { success: true };
 }
 
@@ -439,6 +448,12 @@ export async function updateOrganizationAction(
     console.error("[updateOrganizationAction] update failed:", updateError.message);
     return { error: "Could not update organization. Please try again." };
   }
+
+  // The org name is rendered by the shared app/(dashboard)/layout.tsx (sidebar)
+  // on every route in the group — revalidate the layout, not just this page,
+  // or the sidebar keeps showing the stale name on /teams, /players, etc.
+  revalidatePath("/settings/organization");
+  revalidatePath("/settings/organization", "layout");
 
   return { success: true };
 }
@@ -491,6 +506,8 @@ export async function revokeInvitationAction(
     console.error("[revokeInvitationAction] update failed:", updateError.message);
     return { error: "Could not revoke invitation. Please try again." };
   }
+
+  revalidatePath("/settings/members");
 
   return { success: true };
 }

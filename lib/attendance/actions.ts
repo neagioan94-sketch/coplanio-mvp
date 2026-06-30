@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { requireRole, requireActiveOrganization } from "@/lib/organizations/get-organization";
@@ -70,6 +71,8 @@ export async function saveAttendanceAction(
   const rosterSize = validPlayerIds.size;
 
   if (rosterSize === 0) {
+    revalidatePath(`/training-sessions/${sessionId}/attendance`);
+    revalidatePath(`/training-sessions/${sessionId}`);
     return { success: true };
   }
 
@@ -130,6 +133,9 @@ export async function saveAttendanceAction(
     targetId: sessionId,
     newValue: { count: upsertPayload.length, session_id: sessionId },
   });
+
+  revalidatePath(`/training-sessions/${sessionId}/attendance`);
+  revalidatePath(`/training-sessions/${sessionId}`);
 
   return { success: true };
 }

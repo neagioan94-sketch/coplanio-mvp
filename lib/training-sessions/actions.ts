@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { requireRole } from "@/lib/organizations/get-organization";
@@ -189,6 +190,10 @@ export async function updateSessionAction(
     newValue: { title: parsed.data.title, session_date: parsed.data.session_date },
   });
 
+  revalidatePath(`/training-sessions/${sessionId}`);
+  revalidatePath(`/training-sessions/${sessionId}/edit`);
+  revalidatePath("/training-sessions");
+
   return { success: true };
 }
 
@@ -344,6 +349,8 @@ export async function addSessionExerciseAction(
     newValue: { session_id: sessionId, exercise_id: parsed.data.exercise_id, sort_order: sortOrder },
   });
 
+  revalidatePath(`/training-sessions/${sessionId}`);
+
   return { success: true };
 }
 
@@ -418,6 +425,8 @@ export async function updateSessionExerciseAction(
     previousValue: { planned_duration_minutes: current.planned_duration_minutes, notes: current.notes },
     newValue: { planned_duration_minutes: parsed.data.planned_duration_minutes ?? null, notes: parsed.data.notes ?? null },
   });
+
+  revalidatePath(`/training-sessions/${sessionId}`);
 
   return { success: true };
 }
@@ -518,6 +527,8 @@ export async function reorderSessionExerciseAction(
     newValue: { direction, new_sort_order: adjacent.sort_order },
   });
 
+  revalidatePath(`/training-sessions/${sessionId}`);
+
   return { success: true };
 }
 
@@ -580,6 +591,8 @@ export async function removeSessionExerciseAction(
     targetId: parsed.data.sessionExerciseId,
     previousValue: { session_id: sessionId },
   });
+
+  revalidatePath(`/training-sessions/${sessionId}`);
 
   return { success: true };
 }
