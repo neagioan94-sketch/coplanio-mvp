@@ -116,7 +116,7 @@ function SidebarContent({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-4">
+      <nav className="flex-1 overflow-y-auto px-2 py-4">
         <ul className="flex flex-col gap-1">
           {navItems.map(({ href, label }) => (
             <li key={href}>
