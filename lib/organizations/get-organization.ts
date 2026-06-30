@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export async function getActiveMemberships(
@@ -28,12 +29,18 @@ export async function getActiveOrganization(
     .eq("user_id", userId)
     .eq("status", "active")
     .order("joined_at", { ascending: true, nullsFirst: false })
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .single();
+    .order("created_at", { ascending: true });
 
-  if (error || !data) return null;
-  return { organizationId: data.organization_id, role: data.role };
+  if (error || !data || data.length === 0) return null;
+
+  const cookieStore = await cookies();
+  const preferredOrgId = cookieStore.get("active_organization_id")?.value;
+  const preferred = preferredOrgId
+    ? data.find((m) => m.organization_id === preferredOrgId)
+    : undefined;
+
+  const active = preferred ?? data[0];
+  return { organizationId: active.organization_id, role: active.role };
 }
 
 export async function requireActiveOrganization(

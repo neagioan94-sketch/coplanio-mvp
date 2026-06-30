@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 import {
   getActiveOrganization,
+  getActiveMemberships,
   isOrganizationAdmin,
 } from "@/lib/organizations/get-organization";
 import AppShell from "@/components/layout/app-shell";
@@ -34,12 +35,22 @@ export default async function DashboardLayout({
     activeOrg.organizationId,
   );
 
+  const memberships = await getActiveMemberships(supabase, user.id);
+  const organizations = memberships.map((m) => ({
+    organizationId: m.organization_id,
+    organizationName: Array.isArray(m.organizations)
+      ? (m.organizations[0] as { name: string } | undefined)?.name ?? "Unknown organization"
+      : (m.organizations as { name: string } | null)?.name ?? "Unknown organization",
+  }));
+
   return (
     <AppShell
       orgName={org?.name ?? "Organization"}
       role={activeOrg.role}
       userEmail={user.email ?? ""}
       isAdmin={admin}
+      organizations={organizations}
+      activeOrganizationId={activeOrg.organizationId}
     >
       {children}
     </AppShell>

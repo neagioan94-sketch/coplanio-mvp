@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LogoutButton from "@/components/layout/logout-button";
+import OrganizationSwitcher from "@/components/organizations/organization-switcher";
 
 const ROLE_LABELS: Record<string, string> = {
   organization_admin: "Admin",
@@ -19,11 +20,18 @@ interface NavItem {
   label: string;
 }
 
+interface OrgOption {
+  organizationId: string;
+  organizationName: string;
+}
+
 interface AppSidebarProps {
   orgName: string;
   role: string;
   userEmail: string;
   isAdmin: boolean;
+  organizations: OrgOption[];
+  activeOrganizationId: string;
 }
 
 function SidebarContent({
@@ -31,6 +39,8 @@ function SidebarContent({
   role,
   userEmail,
   isAdmin,
+  organizations,
+  activeOrganizationId,
   onClose,
 }: AppSidebarProps & { onClose?: () => void }) {
   const pathname = usePathname();
@@ -90,10 +100,17 @@ function SidebarContent({
 
       {/* Org context */}
       <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
-          {orgName}
-        </p>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        {organizations.length > 1 ? (
+          <OrganizationSwitcher
+            organizations={organizations}
+            activeOrganizationId={activeOrganizationId}
+          />
+        ) : (
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+            {orgName}
+          </p>
+        )}
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
           {ROLE_LABELS[role] ?? role}
         </p>
       </div>
@@ -136,6 +153,8 @@ export default function AppSidebar({
   role,
   userEmail,
   isAdmin,
+  organizations,
+  activeOrganizationId,
 }: AppSidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -175,6 +194,8 @@ export default function AppSidebar({
           role={role}
           userEmail={userEmail}
           isAdmin={isAdmin}
+          organizations={organizations}
+          activeOrganizationId={activeOrganizationId}
           onClose={() => setIsMobileOpen(false)}
         />
       </aside>

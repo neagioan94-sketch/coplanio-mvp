@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/db/supabase-server";
 import { createAdminClient } from "@/lib/db/supabase-admin";
 import { requireUser } from "@/lib/auth/get-user";
@@ -139,6 +140,17 @@ export async function acceptInvitationAction(
     console.error("[acceptInvitationAction] update failed:", updateError.message);
     return { error: "Could not accept invitation. Please try again." };
   }
+
+  // Switch the active org context to the one just joined, so the user lands
+  // in it immediately instead of staying on whichever org they joined first.
+  const cookieStore = await cookies();
+  cookieStore.set("active_organization_id", organizationId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
+  });
 
   redirect("/dashboard");
 }
@@ -525,6 +537,51 @@ export async function revokeInvitationAction(
   revalidatePath("/settings/members");
 
   return { success: true };
+}
+
+// ---------------------------------------------------------------------------
+// Member: switch active organization
+// ---------------------------------------------------------------------------
+
+export async function switchOrganizationAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const organizationId = formData.get("organizationId");
+  if (!organizationId || typeof organizationId !== "string") {
+    return { error: "Invalid organization" };
+  }
+
+  const user = await requireUser();
+
+  const supabase = await createClient();
+  if (!supabase) return { error: "Service unavailable" };
+
+  // Re-validate membership server-side -- never trust the form value alone,
+  // even though getActiveOrganization() re-checks this too on every read.
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("organization_id", organizationId)
+    .eq("status", "active")
+    .limit(1)
+    .single();
+
+  if (!membership) {
+    return { error: "You are not an active member of that organization" };
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set("active_organization_id", organizationId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
+  });
+
+  redirect("/dashboard");
 }
 
 // Re-export requireOrganizationAccess for use in layout
