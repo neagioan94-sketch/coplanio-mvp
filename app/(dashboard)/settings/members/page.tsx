@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
+import { createAdminClient } from "@/lib/db/supabase-admin";
 import { requireUser } from "@/lib/auth/get-user";
 import { getActiveOrganization, isOrganizationAdmin, requireRole } from "@/lib/organizations/get-organization";
 import { getOrganizationMembers } from "@/lib/organizations/get-members";
@@ -24,8 +25,12 @@ export default async function SettingsMembersPage() {
 
   await requireRole(supabase, user.id, activeOrg.organizationId, ["organization_admin", "head_coach"]);
 
+  // adminClient bypasses RLS: "users can view profiles of shared org members"
+  // requires the TARGET membership to also be status='active', so a regular
+  // client cannot read the email/name of a pending (status='invited') member.
+  const adminClient = createAdminClient();
   const [members, admin] = await Promise.all([
-    getOrganizationMembers(supabase, activeOrg.organizationId),
+    getOrganizationMembers(adminClient ?? supabase, activeOrg.organizationId),
     isOrganizationAdmin(supabase, user.id, activeOrg.organizationId),
   ]);
 
