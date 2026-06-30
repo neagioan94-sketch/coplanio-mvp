@@ -74,7 +74,7 @@ export async function requireRole(
     userId,
     organizationId,
   );
-  if (!allowedRoles.includes(membership.role)) redirect("/organization");
+  if (!allowedRoles.includes(membership.role)) redirect("/dashboard");
   return membership;
 }
 
