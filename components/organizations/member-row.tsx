@@ -47,6 +47,7 @@ function RoleUpdateForm({
       <input type="hidden" name="organizationId" value={organizationId} />
       <input type="hidden" name="memberId" value={member.id} />
       <select
+        key={member.role}
         name="role"
         defaultValue={member.role}
         disabled={pending}
