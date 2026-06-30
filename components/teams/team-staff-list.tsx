@@ -42,6 +42,7 @@ function StaffRowActions({ teamId, organizationId, row }: StaffRowActionsProps) 
           <input type="hidden" name="organizationId" value={organizationId} />
           <input type="hidden" name="teamStaffId" value={row.id} />
           <select
+            key={row.staffRole}
             name="staffRole"
             defaultValue={row.staffRole}
             className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
