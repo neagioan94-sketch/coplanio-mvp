@@ -2,12 +2,12 @@
 
 Football club management platform built with Next.js, TypeScript, Tailwind CSS, and Supabase.
 
-> **Phase 0 — Project Setup**
-> This repository currently contains only the project foundation. No product features are implemented. Domain modules (teams, players, sessions, attendance, matches, assessments, reports) will be added in subsequent phases.
+> **MVP Complete — Phases 0–15**
+> This repository implements the full Coplanio MVP: authentication, organizations/memberships/roles, teams, players, exercises, training sessions, attendance, matches, assessments, reports, and admin settings/audit. See [Implementation Phases](#implementation-phases) below for the full module list.
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui-compatible structure
 - **Backend**: Supabase (auth, database, storage) — wired in Phase 1 & 2
@@ -92,11 +92,21 @@ public/               # Static assets
 
 ## Implementation Phases
 
-- **Phase 0** — Project Setup *(current)*
+All phases below are complete.
+
+- **Phase 0** — Project Setup
 - **Phase 1** — Database & RLS
 - **Phase 2** — Authentication
 - **Phase 3** — Organization, Memberships & Roles
 - **Phase 4** — App Layout & Navigation
-- **Phase 5–13** — Domain modules (Teams, Players, Sessions, Attendance, Matches, Assessments, Reports, Admin & Audit)
+- **Phase 5** — Teams Module
+- **Phase 6** — Players Module
+- **Phase 7** — Exercises Module
+- **Phase 8** — Training Sessions Module
+- **Phase 9** — Attendance Module
+- **Phase 10** — Matches Module
+- **Phase 11** — Assessments Module
+- **Phase 12** — Reports Module
+- **Phase 13** — Admin Settings, Members & Audit
 - **Phase 14** — Responsive Polish
-- **Phase 15** — QA & Deployment
+- **Phase 15** — QA & Deployment Readiness *(complete)*

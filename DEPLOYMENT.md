@@ -50,7 +50,7 @@ Before going live, verify:
 - **Framework:** Next.js 16.2.9 App Router, TypeScript, React 19
 - **Auth:** Supabase Auth with SSR cookies (`@supabase/ssr`)
 - **Database:** Supabase Postgres with Row Level Security (RLS)
-- **Middleware:** `middleware.ts` at repo root — redirects unauthenticated requests to `/login`
+- **Middleware:** `proxy.ts` at repo root (Next.js 16 renamed `middleware.ts` → `proxy.ts`) — redirects unauthenticated requests to `/login`
 - **Organization scoping:** `organizationId` always resolved server-side from the authenticated user's active membership; never trusted from client input
 - **Role model:** `organization_admin`, `head_coach`, `coach`, `staff` — enforced in server actions via `requireRole()`
 
