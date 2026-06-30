@@ -192,35 +192,50 @@ export async function inviteMemberAction(
     };
   }
 
+  // unique(organization_id, user_id) means a removed/suspended row from a prior
+  // membership must be reactivated via UPDATE, not re-inserted.
   const { data: existing } = await supabase
     .from("memberships")
     .select("id, status")
     .eq("organization_id", organizationId)
     .eq("user_id", profile.id)
-    .in("status", ["active", "invited"])
     .limit(1)
     .single();
 
-  if (existing) {
-    return {
-      error:
-        existing.status === "active"
-          ? "This user is already an active member."
-          : "This user already has a pending invitation.",
-    };
+  if (existing?.status === "active") {
+    return { error: "This user is already an active member." };
+  }
+  if (existing?.status === "invited") {
+    return { error: "This user already has a pending invitation." };
   }
 
-  const { error: insertError } = await supabase.from("memberships").insert({
-    organization_id: organizationId,
-    user_id: profile.id,
-    role: parsed.data.role,
-    status: "invited",
-    invited_by: user.id,
-  });
+  if (existing) {
+    const { error: updateError } = await supabase
+      .from("memberships")
+      .update({
+        role: parsed.data.role,
+        status: "invited",
+        invited_by: user.id,
+      })
+      .eq("id", existing.id);
 
-  if (insertError) {
-    console.error("[inviteMemberAction] insert failed:", insertError.message);
-    return { error: "Could not send invitation. Please try again." };
+    if (updateError) {
+      console.error("[inviteMemberAction] update failed:", updateError.message);
+      return { error: "Could not send invitation. Please try again." };
+    }
+  } else {
+    const { error: insertError } = await supabase.from("memberships").insert({
+      organization_id: organizationId,
+      user_id: profile.id,
+      role: parsed.data.role,
+      status: "invited",
+      invited_by: user.id,
+    });
+
+    if (insertError) {
+      console.error("[inviteMemberAction] insert failed:", insertError.message);
+      return { error: "Could not send invitation. Please try again." };
+    }
   }
 
   revalidatePath("/settings/members");
