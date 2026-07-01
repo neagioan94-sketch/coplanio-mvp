@@ -52,6 +52,7 @@ function SidebarContent({
     { href: "/exercises", label: "Exercises" },
     { href: "/training-sessions", label: "Training Sessions" },
     { href: "/matches", label: "Matches" },
+    { href: "/calendar", label: "Calendar" },
     { href: "/assessments", label: "Assessments" },
     { href: "/reports", label: "Reports" },
   ];
