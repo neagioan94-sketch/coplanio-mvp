@@ -53,12 +53,20 @@ export default async function TrainingSessionsPage({
           Training Sessions
         </h1>
         {canManage && (
-          <Link
-            href="/training-sessions/new"
-            className="self-start rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 sm:self-auto"
-          >
-            New session
-          </Link>
+          <div className="flex gap-2 self-start sm:self-auto">
+            <Link
+              href="/training-sessions/ai-planner"
+              className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              AI Planner
+            </Link>
+            <Link
+              href="/training-sessions/new"
+              className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              New session
+            </Link>
+          </div>
         )}
       </div>
 
