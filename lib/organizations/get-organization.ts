@@ -111,6 +111,14 @@ export async function canManageMembers(
   return isOrganizationAdmin(supabase, userId, organizationId);
 }
 
+export async function canManagePortalAccess(
+  supabase: SupabaseClient,
+  userId: string,
+  organizationId: string,
+): Promise<boolean> {
+  return isOrganizationAdmin(supabase, userId, organizationId);
+}
+
 export async function canManageTeams(
   supabase: SupabaseClient,
   userId: string,
