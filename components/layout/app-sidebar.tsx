@@ -60,6 +60,7 @@ function SidebarContent({
     ? [
         { href: "/settings/organization", label: "Organization" },
         { href: "/settings/members", label: "Members" },
+        { href: "/settings/portal-access", label: "Portal Access" },
         { href: "/settings/audit", label: "Audit Log" },
       ]
     : [];

@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
+import { createAdminClient } from "@/lib/db/supabase-admin";
 import {
   getActiveOrganization,
   getActiveMemberships,
   isOrganizationAdmin,
 } from "@/lib/organizations/get-organization";
+import { getActivePortalAccessForUser } from "@/lib/portal/get-portal-access";
 import AppShell from "@/components/layout/app-shell";
 
 export default async function DashboardLayout({
@@ -21,7 +23,16 @@ export default async function DashboardLayout({
   if (!user) redirect("/login");
 
   const activeOrg = await getActiveOrganization(supabase, user.id);
-  if (!activeOrg) redirect("/setup/organization");
+  if (!activeOrg) {
+    // No internal membership — check whether this is a portal-only user
+    // (parent/guardian) before falling back to organization setup.
+    const adminClient = createAdminClient();
+    if (adminClient) {
+      const portalGrants = await getActivePortalAccessForUser(adminClient, user.id);
+      if (portalGrants.length > 0) redirect("/portal");
+    }
+    redirect("/setup/organization");
+  }
 
   const { data: org } = await supabase
     .from("organizations")
