@@ -8,6 +8,7 @@ interface AuditParams {
   targetId?: string;
   previousValue?: Record<string, unknown>;
   newValue?: Record<string, unknown>;
+  source?: "web_app" | "server_action" | "api_route" | "system";
 }
 
 export async function createAuditEvent(
@@ -22,7 +23,7 @@ export async function createAuditEvent(
     target_id: params.targetId ?? null,
     previous_value: params.previousValue ?? null,
     new_value: params.newValue ?? null,
-    source: "server_action",
+    source: params.source ?? "server_action",
   });
   if (error) {
     console.error(
