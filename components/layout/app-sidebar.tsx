@@ -62,6 +62,7 @@ function SidebarContent({
         { href: "/settings/organization", label: "Organization" },
         { href: "/settings/members", label: "Members" },
         { href: "/settings/portal-access", label: "Portal Access" },
+        { href: "/settings/billing", label: "Billing" },
         { href: "/settings/audit", label: "Audit Log" },
       ]
     : [];
@@ -78,6 +79,8 @@ function SidebarContent({
     if (href === "/reports") return pathname === href || pathname.startsWith("/reports/");
     if (href === "/settings/organization") return pathname === href;
     if (href === "/settings/members") return pathname === href;
+    if (href === "/settings/portal-access") return pathname === href;
+    if (href === "/settings/billing") return pathname === href;
     if (href === "/settings/audit") return pathname === href;
     return pathname === href;
   };
