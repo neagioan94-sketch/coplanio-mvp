@@ -58,8 +58,8 @@ export default function AuditEventsList({ events }: AuditEventsListProps) {
               <td className="py-2.5 pr-4 font-mono text-xs text-zinc-500 dark:text-zinc-400">
                 {truncateId(event.targetId)}
               </td>
-              <td className="py-2.5 font-mono text-xs text-zinc-500 dark:text-zinc-400">
-                {truncateId(event.actorUserId)}
+              <td className="py-2.5 text-xs text-zinc-500 dark:text-zinc-400">
+                {event.actorFullName ?? event.actorEmail ?? truncateId(event.actorUserId)}
               </td>
             </tr>
           ))}

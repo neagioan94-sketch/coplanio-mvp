@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 import { requireUser } from "@/lib/auth/get-user";
 import { getActiveOrganization, canManageTeams } from "@/lib/organizations/get-organization";
-import { getTeam, getTeamStaff } from "@/lib/teams/get-teams";
+import { getTeam, getTeamStaff, getTeamRoster } from "@/lib/teams/get-teams";
 import TeamStaffList from "@/components/teams/team-staff-list";
+import TeamRoster from "@/components/teams/team-roster";
 import ArchiveTeamButton from "@/components/teams/archive-team-button";
 
 interface TeamDetailPageProps {
@@ -21,9 +22,10 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
   const activeOrg = await getActiveOrganization(supabase, user.id);
   if (!activeOrg) redirect("/setup/organization");
 
-  const [team, staff, canManage] = await Promise.all([
+  const [team, staff, roster, canManage] = await Promise.all([
     getTeam(supabase, teamId, activeOrg.organizationId),
     getTeamStaff(supabase, teamId, activeOrg.organizationId),
+    getTeamRoster(supabase, teamId, activeOrg.organizationId),
     canManageTeams(supabase, user.id, activeOrg.organizationId),
   ]);
 
@@ -72,6 +74,13 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
           </div>
         )}
       </div>
+
+      <section>
+        <h2 className="mb-3 text-base font-medium text-zinc-900 dark:text-zinc-50">Players</h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <TeamRoster roster={roster} />
+        </div>
+      </section>
 
       <section>
         <h2 className="mb-3 text-base font-medium text-zinc-900 dark:text-zinc-50">Staff</h2>

@@ -78,6 +78,49 @@ export async function getTeam(
   };
 }
 
+export type TeamRosterRow = {
+  membershipId: string;
+  playerId: string;
+  fullName: string;
+  squadNumber: number | null;
+  status: string;
+  primaryPosition: string | null;
+};
+
+export async function getTeamRoster(
+  supabase: SupabaseClient,
+  teamId: string,
+  organizationId: string,
+): Promise<TeamRosterRow[]> {
+  const { data, error } = await supabase
+    .from("player_team_memberships")
+    .select("id, player_id, squad_number, status, players(first_name, last_name, primary_position)")
+    .eq("team_id", teamId)
+    .eq("organization_id", organizationId)
+    .eq("status", "active")
+    .order("squad_number", { ascending: true, nullsFirst: false });
+
+  if (error) {
+    console.error("[getTeamRoster] query failed:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((m) => {
+    const player = Array.isArray(m.players)
+      ? (m.players[0] as { first_name: string; last_name: string; primary_position: string | null } | undefined)
+      : (m.players as { first_name: string; last_name: string; primary_position: string | null } | null);
+
+    return {
+      membershipId: m.id,
+      playerId: m.player_id,
+      fullName: player ? `${player.first_name} ${player.last_name}` : "Unknown player",
+      squadNumber: m.squad_number,
+      status: m.status,
+      primaryPosition: player?.primary_position ?? null,
+    };
+  });
+}
+
 export async function getTeamStaff(
   supabase: SupabaseClient,
   teamId: string,
